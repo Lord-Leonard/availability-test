@@ -11,6 +11,7 @@ type data struct {
 	TotalRequestCount  int
 	FailedRequestCount int
 	FailedRequests     []failedRequest
+	Errors             []error
 }
 
 type failedRequest struct {
@@ -23,12 +24,13 @@ func main() {
 		TotalRequestCount:  0,
 		FailedRequestCount: 0,
 		FailedRequests:     []failedRequest{},
+		Errors:             []error{},
 	}
 
 	for {
 		res, err := http.Get("https://youtube.com")
 		if err != nil {
-			panic(err)
+			data.Errors = append(data.Errors, err)
 		}
 
 		data.TotalRequestCount = data.TotalRequestCount + 1
@@ -42,8 +44,8 @@ func main() {
 
 			data.FailedRequests = append(data.FailedRequests, failedRequest)
 		}
-    
-    prettyData, _ := json.MarshalIndent(data, "", "  ")
+
+		prettyData, _ := json.MarshalIndent(data, "", "  ")
 		fmt.Println(string(prettyData))
 
 		time.Sleep(10 * time.Second)
